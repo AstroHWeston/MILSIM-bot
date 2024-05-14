@@ -33,13 +33,14 @@ module.exports = {
             )
             .addStringOption(option =>
             option
-                .setName('evidence')
-            )
-            .addStringOption(option =>
-            option
                 .setName('approval')
                 .setDescription('Who approved this blacklist?')
                 .setRequired(true)
+            )
+            .addStringOption(option =>
+                option
+                    .setName('evidence')
+                    .setDescription('Any supporting evidence to this blacklist.')
             )
         )
         .addSubcommand(subcommands =>
