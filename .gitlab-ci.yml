@@ -18,6 +18,7 @@ compile:
 testrun:
   stage: run
   script:
+    - npm ci
     - npm run test
   only:
     - master
