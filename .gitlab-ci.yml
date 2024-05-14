@@ -1,0 +1,24 @@
+image: node:latest
+
+stages:
+  - build
+  - run
+
+compile:
+  stage: build
+  image: node:20
+  script:
+    - npm ci
+    - cp .env.example .env
+    - npm run test
+  only:
+    - master
+    - merge_requests
+
+testrun:
+  stage: run
+  script:
+    - npm run test
+  only:
+    - master
+    - merge_requests

@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node deploy-commands.js && node .",
+    "test": "npm ci && node deploy-commands.js && pm2 start index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "AstroHWeston",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.15.2",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "pm2": "^5.3.1"
   }
 }
