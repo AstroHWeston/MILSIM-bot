@@ -50,7 +50,7 @@ module.exports = {
                 .addUserOption(option =>
                     option
                         .setName('user')
-                        .setDescription('Who are you unbanning?')
+                        .setDescription('Who are you unblacklisting?')
                         .setRequired(true)
                 )
         ),
@@ -82,43 +82,48 @@ module.exports = {
         }
 
         try {
-            const member = await interaction.guild.members.fetch(discordId);
-            const roles = member.roles.cache;
-            roles.forEach(role => {
-                permittedRoles.push(role.id);
-            });
-
-            if (permittedRoles.includes('1235067095687893102')) {
-                await interaction.editReply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setTitle('Error')
-                            .setDescription('You cannot ban a staff member.')
-                            .setColor(Colors.Red)
-                            .setFooter({
-                                text: `United States Navy.`,
-                                iconURL: interaction.guild.iconURL()
-                            })
-                            .setTimestamp()
-                    ]
-                })
-                return;
-            }
 
             if (interaction.options.getSubcommand() === 'add') {
+                let blacklistEmbed = new EmbedBuilder()
+                    .setTitle("US Navy Moderation")
+                    .setColor(Colors.Red)
+                    .addFields(
+                        { name: 'Responsible moderator', value: `<@${interaction.user.id}>`, inline: true },
+                        { name: 'Reason', value: banReason || "No Reason Provided.", inline: true }
+                    )
+                    .setFooter({ text: "Naval Moderation" })
+                    .setTimestamp()
+
+                const date = new Date();
+
+                if (interaction.options.getString("type") === 't1') {
+                    date.setMonth(date.getMonth() + 2);
+                    const unixTimestamp = Math.floor(date.getTime() / 1000);
+                    blacklistEmbed
+                        .setDescription(`You have been **blacklisted** from the United States Navy. You may appeal this blacklist in 2 months (<t:${unixTimestamp}:D>) by joining the [USN Appeals Server](https://discord.gg/7TM4fe4Uxe). If you don't choose to appeal, you will be automatically unbanned on <t:${unixTimestamp + 2678400}:D>.`)
+                        .addFields(
+                            { name: 'Blacklist Tier', value: 'Tier 1', inline: true }
+                        )
+                } else if (interaction.options.getString("type") === 't2') {
+                    date.setMonth(date.getMonth() + 9);
+                    const unixTimestamp = Math.floor(date.getTime() / 1000);
+                    blacklistEmbed
+                        .setDescription(`You have been **blacklisted** from the United States Navy. You may appeal this blacklist in 9 months (<t:${unixTimestamp}:D>) by joining the [USN Appeals Server](https://discord.gg/7TM4fe4Uxe). If you don't choose to appeal, you will be automatically unbanned on <t:${unixTimestamp + 8035200}:D>.`)
+                        .addFields(
+                            { name: 'Blacklist Tier', value: 'Tier 2', inline: true }
+                        )
+                } else if (interaction.options.getString("type") === 't3') {
+                    blacklistEmbed
+                        .setDescription(`You have been **__permanently__ blacklisted** from the United States Navy. This blacklist is unappealable and the decision is final.`)
+                        .addFields(
+                            { name: 'Blacklist Tier', value: 'Tier 3', inline: true }
+                        )
+                }
+                const member = interaction.options.getMember("user");
                 if (member) {
                     await member.send({
                         embeds: [
-                            new EmbedBuilder()
-                                .setTitle("US Navy Moderation")
-                                .setDescription('You have been **globally banned** from all United States Navy servers.')
-                                .setColor(Colors.Red)
-                                .addFields(
-                                    { name: 'Responsible moderator', value: `<@${interaction.user.id}>` },
-                                    { name: 'Reason', value: banReason || "No Reason Provided." }
-                                )
-                                .setFooter({ text: "Naval Moderation" })
-                                .setTimestamp()
+                            blacklistEmbed
                         ]
                     })
                 }
@@ -126,9 +131,10 @@ module.exports = {
                 const guilds = interaction.client.guilds.cache.values();
                 const errors = [];
                 for (const guild of guilds) {
+                    if (guild.id === '1091013496096968704') continue;
                     try {
                         await guild.members.ban(discordId, {
-                            reason: `Crossbanned by ${interaction.member.nickname} ==> ${banReason || "No Reason Provided."}`
+                            reason: `Blacklisted by ${interaction.member.nickname} ==> ${banReason || "No Reason Provided."}`
                         });
                     } catch (err) {
                         errors.push(err);
@@ -152,12 +158,23 @@ module.exports = {
                     ]
                 })
             } else if (interaction.options.getSubcommand() === 'remove') {
-                await interaction.guild.members.unban(discordId);
+                const guilds = interaction.client.guilds.cache.values();
+                const errors = [];
+                for (const guild of guilds) {
+
+                    try {
+                        await guild.members.unban(discordId, {
+                            reason: `Unblacklisted by ${interaction.member.nickname} ==> ${banReason || "No Reason Provided."}`
+                        });
+                    } catch (err) {
+                        errors.push(err);
+                    }
+                }
                 await interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
                             .setTitle('Success')
-                            .setDescription('User has been successfully unbanned.')
+                            .setDescription('User has been successfully unblacklisted.')
                             .setColor(Colors.Green)
                             .setFooter({
                                 text: `United States Navy.`,
