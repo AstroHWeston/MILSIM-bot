@@ -8,8 +8,9 @@ module.exports = {
         //client.user.setAvatar('https://cdn.discordapp.com/attachments/1215312117792505868/1215320301248708608/flustered-cute-furry-femboy-uwu-owo.gif?ex=65fc523b&is=65e9dd3b&hm=8e334e454b700b5d796096989d1004b89a71c3a95d3c06ce89601c63b2f8e824&');
         //client.user.setStatus('dnd');
         client.user.setActivity({
-            name: 'with the Computer Core.',
+            name: 'with your emotions.',
             type: ActivityType.Playing,
+            status: 'idle'
         })
     },
 };
