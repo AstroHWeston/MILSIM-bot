@@ -53,6 +53,12 @@ module.exports = {
                         .setDescription('Who are you unblacklisting?')
                         .setRequired(true)
                 )
+                .addStringOption(option =>
+                    option
+                        .setName('reason')
+                        .setDescription('Why is this user being unblacklisted?')
+                        .setRequired(true)
+                )
         ),
 
     async execute (interaction) {
@@ -60,9 +66,10 @@ module.exports = {
 
         const discordId = interaction.options.getUser("user").id;
         const banReason = interaction.options.getString("reason");
+        const approval = interaction.options.getString("approval");
 
-        const permittedRoles = [];
-        const canGlobalBan = interaction.user.id === '1071373709157351464';
+        const permittedRoles = ['908762647527292959', '1030271767199101040', '1224496902632898681'];
+        const canGlobalBan = interaction.member.roles.cache.hasAny(...permittedRoles);
 
         if (!canGlobalBan) {
             await interaction.editReply({
@@ -82,14 +89,13 @@ module.exports = {
         }
 
         try {
-
             if (interaction.options.getSubcommand() === 'add') {
                 let blacklistEmbed = new EmbedBuilder()
                     .setTitle("US Navy Moderation")
                     .setColor(Colors.Red)
                     .addFields(
                         { name: 'Responsible moderator', value: `<@${interaction.user.id}>`, inline: true },
-                        { name: 'Reason', value: banReason || "No Reason Provided.", inline: true }
+                        { name: 'Approval', value: approval, inline: true }
                     )
                     .setFooter({ text: "Naval Moderation" })
                     .setTimestamp()
@@ -102,7 +108,8 @@ module.exports = {
                     blacklistEmbed
                         .setDescription(`You have been **blacklisted** from the United States Navy. You may appeal this blacklist in 2 months (<t:${unixTimestamp}:D>) by joining the [USN Appeals Server](https://discord.gg/7TM4fe4Uxe). If you don't choose to appeal, you will be automatically unbanned on <t:${unixTimestamp + 2678400}:D>.`)
                         .addFields(
-                            { name: 'Blacklist Tier', value: 'Tier 1', inline: true }
+                            { name: 'Blacklist Tier', value: 'Tier 1', inline: true },
+                            { name: 'Reason', value: banReason || "No Reason Provided.", inline: true },
                         )
                 } else if (interaction.options.getString("type") === 't2') {
                     date.setMonth(date.getMonth() + 9);
@@ -110,16 +117,34 @@ module.exports = {
                     blacklistEmbed
                         .setDescription(`You have been **blacklisted** from the United States Navy. You may appeal this blacklist in 9 months (<t:${unixTimestamp}:D>) by joining the [USN Appeals Server](https://discord.gg/7TM4fe4Uxe). If you don't choose to appeal, you will be automatically unbanned on <t:${unixTimestamp + 8035200}:D>.`)
                         .addFields(
-                            { name: 'Blacklist Tier', value: 'Tier 2', inline: true }
+                            { name: 'Blacklist Tier', value: 'Tier 2', inline: true },
+                            { name: 'Reason', value: banReason || "No Reason Provided.", inline: true },
                         )
                 } else if (interaction.options.getString("type") === 't3') {
                     blacklistEmbed
                         .setDescription(`You have been **__permanently__ blacklisted** from the United States Navy. This blacklist is unappealable and the decision is final.`)
                         .addFields(
-                            { name: 'Blacklist Tier', value: 'Tier 3', inline: true }
+                            { name: 'Blacklist Tier', value: 'Tier 3', inline: true },
+                            { name: 'Reason', value: banReason || "No Reason Provided.", inline: true },
                         )
                 }
                 const member = interaction.options.getMember("user");
+                if (member?.roles.cache.hasAny(...permittedRoles)) {
+                    await interaction.editReply({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setTitle('Error')
+                                .setDescription('You cannot blacklist a member of OPNAV+.')
+                                .setColor(Colors.Red)
+                                .setFooter({
+                                    text: `United States Navy.`,
+                                    iconURL: interaction.guild.iconURL()
+                                })
+                                .setTimestamp()
+                        ]
+                    })
+                    return;
+                }
                 if (member) {
                     await member.send({
                         embeds: [
@@ -161,7 +186,6 @@ module.exports = {
                 const guilds = interaction.client.guilds.cache.values();
                 const errors = [];
                 for (const guild of guilds) {
-
                     try {
                         await guild.members.unban(discordId, {
                             reason: `Unblacklisted by ${interaction.member.nickname} ==> ${banReason || "No Reason Provided."}`
@@ -176,6 +200,10 @@ module.exports = {
                             .setTitle('Success')
                             .setDescription('User has been successfully unblacklisted.')
                             .setColor(Colors.Green)
+                            .addFields(
+                                { name: "Reason", value: banReason || "No Reason Provided." },
+                                { name: "Errors", value: errors.length > 0 && errors.join(",\n") || "None" }
+                            )
                             .setFooter({
                                 text: `United States Navy.`,
                                 iconURL: interaction.guild.iconURL()
