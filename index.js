@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const knex = require("knex");
 require('dotenv').config();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -35,5 +36,16 @@ for (const file of eventFiles) {
         client.on(event.name, (...args) => event.execute(...args));
     }
 }
+
+client.knex = knex({
+    client: process.env.DB_CLIENT,
+    connection: {
+        host : process.env.DB_HOST,
+        port : process.env.DB_PORT,
+        user : process.env.DB_USER,
+        password : process.env.DB_PASSWORD,
+        database : process.env.DB_NAME
+    }
+});
 
 client.login(process.env.DISCORD_TOKEN);
