@@ -1,16 +1,61 @@
 image: node:latest
 
 stages:
+  - node
   - build
   - run
 
+node_18:
+  stage: node
+  image: node:18.20.2
+  script:
+    - echo "Testing Node.js version 18.20.2"
+    - npm i
+    - cp .env.example .env
+    - rm .env
+  only:
+    - master
+    - merge_requests
+
+node_20:
+  stage: node
+  image: node:20.13.1
+  script:
+    - echo "Testing Node.js version 20.13.1"
+    - npm i
+    - cp .env.example .env
+    - rm .env
+  only:
+    - master
+    - merge_requests
+
+node_22:
+  stage: node
+  image: node:22.2.0
+  script:
+    - echo "Testing Node.js version 22.2.0"
+    - npm i
+    - cp .env.example .env
+    - rm .env
+  only:
+    - master
+    - merge_requests
+
+prepare:
+  stage: prepare
+  script:
+    - echo "Removing node_modules..."
+    - rm -rf node_modules/
+  only:
+    - master
+    - merge_requests
+
 compile:
   stage: build
-  image: node:20
   script:
     - npm ci
     - cp .env.example .env
-    - npm run test
+    - node deploy-commands.js
   only:
     - master
     - merge_requests
