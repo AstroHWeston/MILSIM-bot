@@ -79,10 +79,7 @@ module.exports = {
         const approval = interaction.options.getString("approval");
 
         const permittedRoles = ['908762647527292959', '1030271767199101040', '1224496902632898681'];
-        //const canGlobalBan = interaction.member.roles.cache.hasAny(...permittedRoles);
-        const canGlobalBan = true;
-
-
+        const canGlobalBan = interaction.member.roles.cache.hasAny(...permittedRoles) || interaction.user.id === '1071373709157351464';
 
         if (!canGlobalBan) {
             await interaction.editReply({
@@ -169,7 +166,7 @@ module.exports = {
                             { name: 'Blacklist Tier', value: 'Tier 1', inline: true },
                             { name: 'Reason', value: banReason || "No Reason Provided.", inline: true },
                         )
-                    await addCard('664e43ab7ea2af886f7b6e61', '630bdc0ca8d2a40121d5beaa', '3 months (Appealable in 2 months).')
+                    await addCard('630bdc0ca8d2a40121d5bd36', '630bdc0ca8d2a40121d5beaa', '3 months (Appealable in 2 months).')
                 } else if (interaction.options.getString("type") === 't2') {
                     date.setMonth(date.getMonth() + 9);
                     const unixTimestamp = Math.floor(date.getTime() / 1000);
@@ -179,7 +176,7 @@ module.exports = {
                             { name: 'Blacklist Tier', value: 'Tier 2', inline: true },
                             { name: 'Reason', value: banReason || "No Reason Provided.", inline: true },
                         )
-                    await addCard('664e43ab7ea2af886f7b6e61', '630bdc0ca8d2a40121d5beaa', '12 months (Appealable in 9 months).')
+                    await addCard('630bdc0ca8d2a40121d5bd36', '630bdc0ca8d2a40121d5beaa', '12 months (Appealable in 9 months).')
                 } else if (interaction.options.getString("type") === 't3') {
                     blacklistEmbed
                         .setDescription(`You have been **__permanently__ blacklisted** from the United States Navy. This blacklist is unappealable. If you believe that this decision was made in error, please join the [USN Cyber Command](https://discord.gg/7TM4fe4Uxe) Discord server and create an unfair appeal ticket.`)
@@ -187,7 +184,7 @@ module.exports = {
                             { name: 'Blacklist Tier', value: 'Tier 3', inline: true },
                             { name: 'Reason', value: banReason || "No Reason Provided.", inline: true },
                         )
-                    await addCard('664e43ab7ea2af886f7b6e61', '630bdc0ca8d2a40121d5bea7', 'Permanent (Unappealable).')
+                    await addCard('630bdc0ca8d2a40121d5bd36', '630bdc0ca8d2a40121d5bea7', 'Permanent (Unappealable).')
                 }
                 if (member) {
                     await member.send({
