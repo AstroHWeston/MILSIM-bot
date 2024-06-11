@@ -78,7 +78,7 @@ module.exports = {
         const banReason = interaction.options.getString("reason");
         const approval = interaction.options.getString("approval");
 
-        const permittedRoles = ['908762647527292959', '1030271767199101040', '1224496902632898681', '1224496427556667543'];
+        const permittedRoles = ['908762498331709480', '1030271767199101040', '1224496902632898681', '1224496427556667543'];
         const canGlobalBan = interaction.member.roles.cache.hasAny(...permittedRoles) || interaction.user.id === '1071373709157351464';
 
         if (!canGlobalBan) {
